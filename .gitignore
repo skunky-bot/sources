@@ -7,3 +7,10 @@
 __pycache__/
 *.pyc
 .venv/
+
+# Never commit runtime or secret-bearing environment files
+.env
+.env.*
+!.env.example
+*.credentials
+*.secret
