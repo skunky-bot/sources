@@ -3,6 +3,7 @@ from pydantic import BaseModel, Field, AwareDatetime, ConfigDict
 
 EventType = Literal["lead_found", "scrape_progress", "run_started", "run_completed", "error"]
 
+
 class LeadData(BaseModel):
     name: Optional[str] = None
     phone: Optional[str] = Field(None, description="E.164 format, e.g., +27XXXXXXXXX")
@@ -12,6 +13,7 @@ class LeadData(BaseModel):
     status: Optional[str] = None
     extra: Dict[str, Any] = Field(default_factory=dict)
 
+
 class StatsData(BaseModel):
     processed: Optional[int] = 0
     success: Optional[int] = 0
@@ -20,6 +22,7 @@ class StatsData(BaseModel):
     hlr_passed: Optional[int] = 0
     hlr_failed: Optional[int] = 0
     leads_extracted: Optional[int] = 0
+
 
 class EventPayload(BaseModel):
     model_config = ConfigDict(extra="allow")
