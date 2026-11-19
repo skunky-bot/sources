@@ -1,25 +1,32 @@
-from starlette.middleware.base import BaseHTTPMiddleware
-from starlette.requests import Request
-from starlette.responses import Response, JSONResponse
-from config import MAX_BODY_BYTES, SIGNING_SECRET
-from utils import compute_sig
+"""Minimal authenticated Skunky events ingestion service."""
+import json
 
-class BodyLimitMiddleware(BaseHTTPMiddleware):
-    async def dispatch(self, request: Request, call_next):
-        body = await request.body()
-        if len(body) > MAX_BODY_BYTES:
-            return JSONResponse({"error": "payload too large"}, status_code=413)
-        # stash body so downstream can reuse it without re-reading
-        request.state.raw_body = body
-        return await call_next(request)
+from fastapi import FastAPI, HTTPException, Request
+from fastapi.responses import PlainTextResponse
+from pydantic import ValidationError
 
-class SignatureMiddleware(BaseHTTPMiddleware):
-    async def dispatch(self, request: Request, call_next):
-        if request.method == "POST" and request.url.path.endswith("/events") and SIGNING_SECRET:
-            provided = request.headers.get("X-Signature", "")
-            if not provided.startswith("sha256="):
-                return JSONResponse({"error": "missing or invalid signature"}, status_code=401)
-            expected = compute_sig(SIGNING_SECRET, request.state.raw_body)
-            if provided != f"sha256={expected}":
-                return JSONResponse({"error": "signature mismatch"}, status_code=401)
-        return await call_next(request)
+from middleware import BodyLimitMiddleware, SignatureMiddleware
+from models import EventPayload
+from storage import append_ndjson, writable
+
+app = FastAPI(title="Skunky Events", version="0.1.0")
+app.add_middleware(SignatureMiddleware)
+app.add_middleware(BodyLimitMiddleware)
+
+
+@app.get("/healthz", response_class=PlainTextResponse)
+def health():
+    return "ok"
+
+
+@app.post("/events")
+async def receive_event(request: Request):
+    try:
+        payload = EventPayload.model_validate(json.loads(request.state.raw_body))
+    except (json.JSONDecodeError, ValidationError, TypeError) as exc:
+        raise HTTPException(status_code=400, detail="Invalid event payload") from exc
+    if not writable():
+        raise HTTPException(status_code=503, detail="Event store unavailable")
+    line = payload.model_dump_json()
+    append_ndjson(payload.event, line)
+    return {"status": "ok"}

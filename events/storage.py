@@ -1,17 +1,22 @@
-import os, datetime, io
-from typing import Dict, Any
+import datetime
+import io
+import os
 from config import EVENTS_DIR
 
 # Writes line-delimited JSON (NDJSON) into date-partitioned files
+
+
 def ensure_dirs() -> None:
     os.makedirs(EVENTS_DIR, exist_ok=True)
     today = datetime.datetime.utcnow().strftime("%Y-%m-%d")
     os.makedirs(os.path.join(EVENTS_DIR, today), exist_ok=True)
 
+
 def _path_for(event_type: str) -> str:
     today = datetime.datetime.utcnow().strftime("%Y-%m-%d")
     filename = f"{event_type}.ndjson"
     return os.path.join(EVENTS_DIR, today, filename)
+
 
 def append_ndjson(event_type: str, json_line: str) -> None:
     ensure_dirs()
@@ -21,6 +26,7 @@ def append_ndjson(event_type: str, json_line: str) -> None:
         f.write(json_line)
         if not json_line.endswith("\n"):
             f.write("\n")
+
 
 def writable() -> bool:
     try:

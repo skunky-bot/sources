@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "ownership": "skunky-bot/sources",
+  "sources": [
+    {
+      "id": "example-docs",
+      "label": "Example Domain fixture",
+      "url": "https://example.com/",
+      "tags": [
+        "demo",
+        "example",
+        "documentation"
+      ],
+      "enabled": true,
+      "mode": "caller-supplied-html",
+      "outreach_allowed": false,
+      "lawful_basis": "not assessed",
+      "robots_review": "not required for supplied fixture HTML"
+    }
+  ]
+}

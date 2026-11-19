@@ -11,6 +11,8 @@ jobs:
   test:
     name: Run tests
     runs-on: ubuntu-latest
+    env:
+      SIGNING_SECRET: ci-only-hmac-signing-key-for-isolated-tests
     defaults:
       run:
         working-directory: events
@@ -34,7 +36,7 @@ jobs:
           flake8 . --max-line-length=100 --exclude=.venv,__pycache__
 
       - name: Run pytest
-        run: pytest -q --disable-warnings
+        run: python -m pytest -q --disable-warnings
 
   docker:
     name: Build Docker image
