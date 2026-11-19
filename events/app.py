@@ -1,8 +1,9 @@
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.requests import Request
-from starlette.responses import Response, JSONResponse
+from starlette.responses import JSONResponse
 from config import MAX_BODY_BYTES, SIGNING_SECRET
 from utils import compute_sig
+
 
 class BodyLimitMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
@@ -12,6 +13,7 @@ class BodyLimitMiddleware(BaseHTTPMiddleware):
         # stash body so downstream can reuse it without re-reading
         request.state.raw_body = body
         return await call_next(request)
+
 
 class SignatureMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
