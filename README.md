@@ -1,55 +1,19 @@
-# SkunkScrape Sources
+# Skunky source registry
 
-This repo contains curated **data sources** and **UI state configs** for SkunkScrape.
-It also includes Python helpers for **MSISDN validation** and **HLR lookups**.
+This repository is the canonical home for source metadata, usage permissions and ingestion policy for the Skunky platform (including SkunkScrape).
 
-## 🚀 Structure
-- `config/` → `sources.json` and `ui_state.json`
-- `scripts/` → validation + scraping helpers
-- `tests/` → unit tests
-- `.env.example` → sample environment file
-- `.github/workflows/validate.yml` → CI/CD workflow
+## V1 contract
 
-## 🔌 Environment
-Create a `.env` file in repo root:
+`registry/sources.v1.json` contains the versioned allowed-source schema. Currently it includes only a safe `example.com` documentation fixture; **no production scraping targets have been approved**.
 
-```bash
-WEBHOOK_URL=https://webhook.skunkscrape.com/events
-PROXIES=http://user:password@proxy1:8080
-HLR_API=https://api.hlrlookup.com/hlr?msisdn={number}&apikey=YOUR_KEY
-```
+Properties: `id`, `label`, `url`, `tags`, `enabled`, `mode`, `outreach_allowed`, `lawful_basis`, `robots_review`.
 
-## ▶️ Usage
-Install deps:
+The `search` repository currently carries a matching fixture for self-contained development; a release workflow to distribute signed/versioned registry artifacts is pending.
 
-```bash
-Copy code
-pip install -r requirements.txt
-Run validation:
-```
-```bash
-Copy code
-python scripts/validate_numbers.py
-```
-Run scrape:
+## Security
 
-```bash
-Copy code
-python scripts/scrape_runner.py
-```
+A previously tracked `.env` file has been removed from this branch. Rotate any associated live credentials, assess exposure and consult [remediation guidance](docs/SECURITY.md). Git history still contains earlier versions until separately remediated.
 
----
+Do not include personal leads, proxy credentials or API secrets in the source registry. Privacy/compliance and source rights must be approved before enabling any production target.
 
-## 📄 .gitignore
-
-```gitignore
-# Environment
-.env
-*.key
-*.pem
-
-# Python
-__pycache__/
-*.pyc
-.venv/
-```
+Run `python -m pytest -q tests/test_registry.py` and review source changes through a protected PR.
