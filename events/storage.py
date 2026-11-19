@@ -5,6 +5,7 @@ from config import EVENTS_DIR
 
 # Writes line-delimited JSON (NDJSON) into date-partitioned files
 
+
 def ensure_dirs() -> None:
     os.makedirs(EVENTS_DIR, exist_ok=True)
     today = datetime.datetime.utcnow().strftime("%Y-%m-%d")
