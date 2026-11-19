@@ -11,6 +11,8 @@ jobs:
   test:
     name: Run tests
     runs-on: ubuntu-latest
+    env:
+      SIGNING_SECRET: ci-only-hmac-signing-key-for-isolated-tests
     defaults:
       run:
         working-directory: events
